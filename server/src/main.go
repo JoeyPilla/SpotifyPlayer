@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 var code = ""
@@ -33,7 +32,6 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	urlRedirect := r.URL
 	query := urlRedirect.Query()
 	code = query["code"][0]
-
 	v := url.Values{}
 	v.Set("grant_type", "authorization_code")
 	v.Set("code", code)
@@ -55,19 +53,39 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	body, _ := ioutil.ReadAll(res.Body)
 	var tokens TokenResponse
 	err = json.Unmarshal(body, &tokens)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(strings.Split(tokens.Scope, " "))
-	if tokens == (TokenResponse{}) {
-		fmt.Fprintf(w, "Invalid authorization code, %q", code)
+	if res.StatusCode == 200 {
+		w.Write(body)
+		accessToken = tokens.AccessToken
 	} else {
-		fmt.Fprintf(w, "Access token: %q\nToken type: %q\nExpires in: %d\nRefresh token: %q\nScope: %q\n", tokens.AccessToken, tokens.TokenType, tokens.ExpiresIn, tokens.RefreshToken, tokens.Scope)
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Invalid authorization code, %q", code)
 	}
+
+}
+
+func getCurrentSongHandler(w http.ResponseWriter, r *http.Request) {
+	//client := &http.Client{}
+
+	url := "https://api.spotify.com/v1/me/player"
+
+	req, _ := http.NewRequest("GET", url, nil)
+	var bearer = "Bearer " + accessToken
+	fmt.Println(bearer)
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+	w.Write(body)
+
 }
 
 func main() {
@@ -75,6 +93,7 @@ func main() {
 
 	http.Handle("/", buildHandler)
 	http.HandleFunc("/redirect", redirectHandler)
+	http.HandleFunc("/currentSong", getCurrentSongHandler)
 	log.Fatal(http.ListenAndServe(":4001", nil))
 }
 
