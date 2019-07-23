@@ -76,7 +76,6 @@ func getCurrentSongHandler(w http.ResponseWriter, r *http.Request) {
 
 	req, _ := http.NewRequest("GET", url, nil)
 	var bearer = "Bearer " + accessToken
-	fmt.Println(bearer)
 	req.Header.Set("Authorization", bearer)
 	req.Header.Set("Content-Type", "application/json")
 

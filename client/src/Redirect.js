@@ -9,6 +9,7 @@ function getCurrentSong() {
       return response.json();
     }
   }).then(function (data) {
+    console.log(data);
     if (typeof data !== 'number') {
       
     } else {
