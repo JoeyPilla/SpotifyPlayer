@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { authEndpoint, clientId, redirectUri, scopes } from "./config";
 import hash from "./hash";
 import logo from "./logo.svg";
-import "./App.css";
 
 export default class SpotifyLogin extends Component {
   constructor() {

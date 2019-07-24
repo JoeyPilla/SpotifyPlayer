@@ -87,38 +87,128 @@ func getCurrentSongHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+type SongInfo struct {
+	Track   string   `json:"track"`
+	Artists []string `json:"artists"`
+	Album   string   `json:"album"`
+}
+
+type ArtistInfo struct {
+	Artist string   `json:"artist"`
+	Genres []string `json:"genres"`
+}
+
+func getTopArtistList(limit int, offset int, kind string, timeRange string) []ArtistInfo {
+	data := []ArtistInfo{}
+	s := fmt.Sprintf("https://api.spotify.com/v1/me/top/%s?limit=%d&offset=%d&time_range=%s", kind, limit, offset*limit, timeRange)
+
+	req, _ := http.NewRequest("GET", s, nil)
+	var bearer = "Bearer " + accessToken
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+	var results map[string]interface{}
+	json.Unmarshal(body, &results)
+	items := results["items"].([]interface{})
+	for _, item := range items {
+		destructuredItem := item.(map[string]interface{})
+		name := destructuredItem["name"]
+		genresTemp := destructuredItem["genres"].([]interface{})
+		genres := []string{}
+		for _, s := range genresTemp {
+			genres = append(genres, s.(string))
+		}
+		data = append(data, ArtistInfo{
+			Artist: name.(string),
+			Genres: genres,
+		})
+
+	}
+	return data
+}
+
+func getTopList(limit int, offset int, kind string, timeRange string) []SongInfo {
+	data := []SongInfo{}
+	s := fmt.Sprintf("https://api.spotify.com/v1/me/top/%s?limit=%d&offset=%d&time_range=%s", kind, limit, offset*limit, timeRange)
+
+	req, _ := http.NewRequest("GET", s, nil)
+	var bearer = "Bearer " + accessToken
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+	var results map[string]interface{}
+	json.Unmarshal(body, &results)
+	items := results["items"].([]interface{})
+	for _, item := range items {
+		destructuredItem := item.(map[string]interface{})
+
+		name := destructuredItem["name"]
+		album := destructuredItem["album"].(map[string]interface{})["name"]
+		artistsTemp := destructuredItem["artists"].([]interface{})
+		artists := []string{}
+		for _, a := range artistsTemp {
+			artists = append(artists, a.(map[string]interface{})["name"].(string))
+		}
+		data = append(data, SongInfo{
+			Track:   name.(string),
+			Artists: artists,
+			Album:   album.(string),
+		})
+	}
+	return data
+}
+
+type TimeRanges struct {
+	Songs   []SongInfo   `json:"songs"`
+	Artists []ArtistInfo `json:"artists"`
+}
+type ReturnData struct {
+	Long   TimeRanges `json:"long"`
+	Medium TimeRanges `json:"medium"`
+	Short  TimeRanges `json:"short"`
+}
+
+func getTopSongsHandler(w http.ResponseWriter, r *http.Request) {
+	limit := 20
+	kind := "tracks"
+	long := "long_term"
+	medium := "medium_term"
+	short := "short_term"
+	body := ReturnData{
+		Long:   TimeRanges{},
+		Medium: TimeRanges{},
+		Short:  TimeRanges{},
+	}
+	for i := 0; i < 3; i++ {
+		body.Long.Songs = append(body.Long.Songs, getTopList(limit, i, kind, long)...)
+		body.Long.Artists = append(body.Long.Artists, getTopArtistList(limit, i, "artists", long)...)
+		body.Medium.Songs = append(body.Medium.Songs, getTopList(limit, i, kind, medium)...)
+		body.Medium.Artists = append(body.Medium.Artists, getTopArtistList(limit, i, "artists", medium)...)
+		body.Short.Songs = append(body.Short.Songs, getTopList(limit, i, kind, short)...)
+		body.Short.Artists = append(body.Short.Artists, getTopArtistList(limit, i, "artists", short)...)
+	}
+	resJson, err := json.Marshal(body)
+	if err != nil {
+		fmt.Println(err)
+	}
+	w.Write(resJson)
+}
+
 func main() {
 	buildHandler := http.FileServer(http.Dir("../../client/build"))
 
 	http.Handle("/", buildHandler)
 	http.HandleFunc("/redirect", redirectHandler)
 	http.HandleFunc("/currentSong", getCurrentSongHandler)
+	http.HandleFunc("/topSongs", getTopSongsHandler)
+
 	log.Fatal(http.ListenAndServe(":4001", nil))
 }
-
-// url := "https://accounts.spotify.com/api/token"
-
-// payload := strings.NewReader("grant_type=authorization_code&redirect_uri=http%3A%2F%2Flocalhost%3A4001%2Fredirect&code=AQAN4BrN62z2V3fH69kM-2PeLC9LynpyyGWtg14xcz88fPeh-eUMwoKDsABwO3u0TtE_71fWQh-oA_uHN88ZzA7qZpGGs4U-qVBOtKT8xhGrhBZFQcZTrMDwz1gPoKH4pk3JSUMjgtu33emP3e5TTdnPgeTYQ2YpY_f6OT5ILT_OqxjpdWiGgU6r9-7pIW18jvVdDeyPQrDvWwjtKuvzyolb4G3wOunwZhrk4j6Wv-5isElLsC1TjsjF%0A")
-
-// req, _ := http.NewRequest("POST", url, payload)
-
-// req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-// req.Header.Add("Authorization", "Basic NDZmMjc4NmY4NTlhNGY3Y2JmNzQ4MmRlM2FjZmU3Y2Y6NjMxN2U3MzU2YjEzNDFhNTkwMmRlMzFmOWI4NTkxZmQ=")
-// req.Header.Add("User-Agent", "PostmanRuntime/7.15.0")
-// req.Header.Add("Accept", "*/*")
-// req.Header.Add("Cache-Control", "no-cache")
-// req.Header.Add("Postman-Token", "cccc4d26-b5f0-40e5-bc50-886117552729,3fd1a5d5-e8f7-4bcd-9336-0b280701a037")
-// req.Header.Add("Host", "accounts.spotify.com")
-// req.Header.Add("cookie", "csrf_token=AQDizw1mmrDPliD_dy9vzJ5CndKAuahSAIdhlgjlYKLu0-mBW2zDO6XOBDG3DMYKsbVs-eYlSIGOmSHvaA")
-// req.Header.Add("accept-encoding", "gzip, deflate")
-// req.Header.Add("content-length", "340")
-// req.Header.Add("Connection", "keep-alive")
-// req.Header.Add("cache-control", "no-cache")
-
-// res, _ := http.DefaultClient.Do(req)
-
-// defer res.Body.Close()
-// body, _ := ioutil.ReadAll(res.Body)
-
-// fmt.Println(res)
-// fmt.Println(string(body))
