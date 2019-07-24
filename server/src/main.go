@@ -3,11 +3,16 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
+	"strings"
 )
+
+var client = &http.Client{}
 
 var code = ""
 var accessToken = ""
@@ -28,7 +33,6 @@ type TokenResponse struct {
 }
 
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
-	client := &http.Client{}
 	urlRedirect := r.URL
 	query := urlRedirect.Query()
 	code = query["code"][0]
@@ -62,6 +66,16 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	if res.StatusCode == 200 {
 		w.Write(body)
 		accessToken = tokens.AccessToken
+		file, err := os.Create("RefreshToken.txt")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
+		_, err = io.WriteString(file, tokens.RefreshToken)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, "Invalid authorization code, %q", code)
@@ -70,7 +84,6 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getCurrentSongHandler(w http.ResponseWriter, r *http.Request) {
-	//client := &http.Client{}
 
 	url := "https://api.spotify.com/v1/me/player"
 
@@ -170,30 +183,24 @@ type TimeRanges struct {
 	Songs   []SongInfo   `json:"songs"`
 	Artists []ArtistInfo `json:"artists"`
 }
-type ReturnData struct {
-	Long   TimeRanges `json:"long"`
-	Medium TimeRanges `json:"medium"`
-	Short  TimeRanges `json:"short"`
-}
 
 func getTopSongsHandler(w http.ResponseWriter, r *http.Request) {
+	urlRedirect := r.URL
+	query := urlRedirect.Query()
+	kind := query["type"][0]
+	term := query["term"][0]
 	limit := 20
-	kind := "tracks"
-	long := "long_term"
-	medium := "medium_term"
-	short := "short_term"
-	body := ReturnData{
-		Long:   TimeRanges{},
-		Medium: TimeRanges{},
-		Short:  TimeRanges{},
+
+	body := TimeRanges{
+		Songs:   []SongInfo{},
+		Artists: []ArtistInfo{},
 	}
 	for i := 0; i < 3; i++ {
-		body.Long.Songs = append(body.Long.Songs, getTopList(limit, i, kind, long)...)
-		body.Long.Artists = append(body.Long.Artists, getTopArtistList(limit, i, "artists", long)...)
-		body.Medium.Songs = append(body.Medium.Songs, getTopList(limit, i, kind, medium)...)
-		body.Medium.Artists = append(body.Medium.Artists, getTopArtistList(limit, i, "artists", medium)...)
-		body.Short.Songs = append(body.Short.Songs, getTopList(limit, i, kind, short)...)
-		body.Short.Artists = append(body.Short.Artists, getTopArtistList(limit, i, "artists", short)...)
+		if kind == "tracks" {
+			body.Songs = append(body.Songs, getTopList(limit, i, kind, term)...)
+		} else {
+			body.Artists = append(body.Artists, getTopArtistList(limit, i, kind, term)...)
+		}
 	}
 	resJson, err := json.Marshal(body)
 	if err != nil {
@@ -202,10 +209,45 @@ func getTopSongsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(resJson)
 }
 
-func main() {
-	buildHandler := http.FileServer(http.Dir("../../client/build"))
+func returningUserHandler(w http.ResponseWriter, r *http.Request) {
+	endpoint := "https://accounts.spotify.com/api/token"
 
+	payload := strings.NewReader(fmt.Sprintf("grant_type=refresh_token&refresh_token=%s", refreshToken))
+	req, err := http.NewRequest("POST", endpoint, payload)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(options.clientId, options.clientSecret)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(fmt.Sprintf("grant_type=refresh_token&refresh_token=%s", refreshToken))
+	res, err := client.Do(req)
+	defer res.Body.Close()
+	if err != nil {
+		fmt.Println(err)
+	}
+	body, _ := ioutil.ReadAll(res.Body)
+	var tokens TokenResponse
+	err = json.Unmarshal(body, &tokens)
+	if err != nil {
+		fmt.Println(err)
+	}
+	var results map[string]interface{}
+	json.Unmarshal(body, &results)
+	accessToken = results["access_token"].(string)
+	fmt.Println(accessToken)
+	fmt.Fprintf(w, "Success")
+}
+
+func main() {
+	dat, err := ioutil.ReadFile("./RefreshToken.txt")
+	if err != nil {
+		fmt.Println(err)
+	}
+	refreshToken = string(dat)
+
+	buildHandler := http.FileServer(http.Dir("../../client/build"))
 	http.Handle("/", buildHandler)
+	http.HandleFunc("/returningUser", returningUserHandler)
 	http.HandleFunc("/redirect", redirectHandler)
 	http.HandleFunc("/currentSong", getCurrentSongHandler)
 	http.HandleFunc("/topSongs", getTopSongsHandler)

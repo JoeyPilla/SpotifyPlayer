@@ -35,8 +35,6 @@ export default class SpotifyLogin extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
           {!this.state.token && (
             <>
             <a
@@ -45,15 +43,11 @@ export default class SpotifyLogin extends Component {
             >
             Authenticate Spotify
             </a>
-            <button>
-              hello
-            </button>
               </>
           )}
           {this.state.token && (
-<h1>fdsa</h1>
+            <h1>fdsa</h1>
           )}
-        </header>
       </div>
     );
   }
