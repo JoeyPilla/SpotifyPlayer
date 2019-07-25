@@ -29,9 +29,9 @@ export default function NavBar() {
           <NavElement>
             <StyledLink to="/FavoriteSongs/">Favorite Songs</StyledLink>
           </NavElement>
-          <NavElement>
+          {/* <NavElement>
             <StyledLink to="/FavoriteArtists/">Favorite Artists</StyledLink>
-          </NavElement>
+          </NavElement> */}
         </NavLeft>
         <NavRight>
           {!loggedIn &&
@@ -54,7 +54,7 @@ const NavContainer = styled.div`
   top: 0;
   left: 0;
   width: 100%;
-  background-color: black;
+  background-color: #222326;
   Height: 50px;
 `
 const NavLeft = styled.div`
@@ -73,7 +73,7 @@ const StyledLink = styled(Link)`
   font-family: Helvetica, Arial, sans-serif;
   text-decoration: none;
   :hover {
-   background-color:pink;
+   background-color:#595959;
   }
   .active {
     color: red;
@@ -87,7 +87,7 @@ const NavElement = styled.div`
   font-family: Helvetica, Arial, sans-serif;
   width: 150px;
   :hover {
-   background-color:pink;
+   background-color:#595959;
   }
   .active {
     color: red;

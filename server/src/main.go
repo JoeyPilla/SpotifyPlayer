@@ -13,7 +13,7 @@ import (
 )
 
 var client = &http.Client{}
-
+var users Users
 var code = ""
 var accessToken = ""
 var refreshToken = ""
@@ -101,9 +101,10 @@ func getCurrentSongHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type SongInfo struct {
-	Track   string   `json:"track"`
-	Artists []string `json:"artists"`
-	Album   string   `json:"album"`
+	Track    string   `json:"track"`
+	Artists  []string `json:"artists"`
+	Album    string   `json:"album"`
+	AlbumArt []string `json:"albumArt`
 }
 
 type ArtistInfo struct {
@@ -165,15 +166,21 @@ func getTopList(limit int, offset int, kind string, timeRange string) []SongInfo
 
 		name := destructuredItem["name"]
 		album := destructuredItem["album"].(map[string]interface{})["name"]
+		albumArtTemp := destructuredItem["album"].(map[string]interface{})["images"].([]interface{})
 		artistsTemp := destructuredItem["artists"].([]interface{})
 		artists := []string{}
 		for _, a := range artistsTemp {
 			artists = append(artists, a.(map[string]interface{})["name"].(string))
 		}
+		albumArt := []string{}
+		for _, art := range albumArtTemp {
+			albumArt = append(albumArt, art.(map[string]interface{})["url"].(string))
+		}
 		data = append(data, SongInfo{
-			Track:   name.(string),
-			Artists: artists,
-			Album:   album.(string),
+			Track:    name.(string),
+			Artists:  artists,
+			Album:    album.(string),
+			AlbumArt: albumArt,
 		})
 	}
 	return data
@@ -238,12 +245,26 @@ func returningUserHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Success")
 }
 
+type Users struct {
+	Users []User `json:"users"`
+}
+
+type User struct {
+	Name         string `json:"name"`
+	RefreshToken string `json:"refreshToken"`
+	AccessToken  string
+}
+
 func main() {
-	dat, err := ioutil.ReadFile("./RefreshToken.txt")
-	if err != nil {
-		fmt.Println(err)
+	byteValue, _ := ioutil.ReadFile("./RefreshToken.json")
+
+	var users Users
+
+	json.Unmarshal(byteValue, &users)
+	for i := 0; i < len(users.Users); i++ {
+		fmt.Println("User Name: " + users.Users[i].Name)
+		fmt.Println("User Refresh Token: " + users.Users[i].RefreshToken)
 	}
-	refreshToken = string(dat)
 
 	buildHandler := http.FileServer(http.Dir("../../client/build"))
 	http.Handle("/", buildHandler)

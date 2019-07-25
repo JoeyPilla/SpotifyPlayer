@@ -14,7 +14,7 @@ function AppRouter() {
       <NavBar />
       <ContentContainer>
       <Route path="/" exact component={Home} />
-        <Route path="/FavoriteArtists" exact component={FavoriteArtists} />
+        {/* <Route path="/FavoriteArtists" exact component={FavoriteArtists} /> */}
         <Route path="/FavoriteSongs" exact component={FavoriteSongs} />
         <Route path="/redirect" component={Redirect} />
       </ContentContainer>
@@ -22,7 +22,10 @@ function AppRouter() {
   );
 }
 const ContentContainer = styled.div`
+  left: 0;
+  width:100vw;
   margin-top: 50px;
+  margin-left: 0;
 `
 
 export default AppRouter;

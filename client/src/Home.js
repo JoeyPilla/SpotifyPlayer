@@ -75,59 +75,7 @@ export default function Home() {
 
   return (
     <div>
-      <button onClick={() => {
-        getCurrentSong();
-        fetch(`/topSongs`).then(function (response) {
-          if (response.status === 500) {
-            return  response.status
-          } else {
-            return response.json();
-          }
-        }).then(function (data) {
-          setLong(data.long)
-          setMedium(data.medium)
-          setShort(data.short)
-        });
-      }
-      }>
-        press to get current song
-      </button>
-      <div>
-      Top Songs Long Term
-      <ol>
-      {LongSongs}
-      </ol>
-      </div>
-      <div>
-      Top Songs Medium Term
-      <ol>
-      {MediumSongs}
-      </ol>
-      </div>
-      <div>
-      Top Songs Short Term
-      <ol>
-      {ShortSongs}
-      </ol>
-      </div>
-      <div>
-      Top Artists Long Term
-      <ol>
-      {LongArtists}
-      </ol>
-      </div>
-      <div>
-      Top Artists Medium Term
-      <ol>
-      {MediumArtists}
-      </ol>
-      </div>
-      <div>
-      Top Artists Short Term
-      <ol>
-      {ShortArtists}
-      </ol>
-      </div>
+     
     </div>
   );
 }
