@@ -1,9 +1,26 @@
 import React, {useState, useEffect} from "react";
 import styled from "styled-components"
 
+function AlbumArt2({ albumArt, audioPreview }) {
+  var audio = new Audio(audioPreview)
+  return(
+    <AlbumArt src={albumArt} onClick={() => {
+      if (audio.paused) {
+        audio.play()
+      } else {
+        audio.pause()
+      }
+  }} />
+)
+}
+
 
 export default function FetchFavoritesContainer({ term, type, title, email }) {
   const [data, setData] = useState({songs: [], artists: []});
+  const [playing, setPlaying] = useState(false);
+  const [url, setUrl] = useState("");
+ 
+
   useEffect(() => {
     fetch(`/topSongs?term=${term}&type=${type}&email=${email}`)
     .then(function (response) {
@@ -21,9 +38,13 @@ export default function FetchFavoritesContainer({ term, type, title, email }) {
   var dataArray = []
   if (data && type === "tracks") {
     dataArray = data.songs.map((song, i) => {
+      console.log(song);
+      const artists = song.artists.map((artist, i) => {
+        return <Artista href={song.artistsUrl[i]}>{artist} </Artista>
+      })
       return (
         <Element>
-          <AlbumArt src={song.AlbumArt[0]} />
+          <AlbumArt2 albumArt={song.albumArt[0]} audioPreview={song.audioPreview}/>
           <Info>
             <Count>
               {i+1}
@@ -33,7 +54,7 @@ export default function FetchFavoritesContainer({ term, type, title, email }) {
                 {`${song.track}`}
               </Name>
               <Artist>
-                {`${song.artists.toString()}`}
+                {artists}
               </Artist>
             </Info2>
           </Info>
@@ -42,6 +63,7 @@ export default function FetchFavoritesContainer({ term, type, title, email }) {
     })
   } else if(data && type === "artists") {
     dataArray = data.artists.map((artist, i) => {
+      console.log(artist);
       var genres = artist.genres.reduce((acc, current, i) => {
         if (i === 0) {
           return current
@@ -50,13 +72,13 @@ export default function FetchFavoritesContainer({ term, type, title, email }) {
       }, "")
       return (
         <Element>
-        <AlbumArt src={artist.AlbumArt} />
+        <AlbumArt src={artist.albumArt} />
         <Info>
           <Count>
             {i+1}
           </Count>
           <Info2>
-            <Name>
+            <Name href={artist.artistUrl}>
               {`${artist.artist}`}
             </Name>
             <Artist>
@@ -95,7 +117,7 @@ const AlbumArt = styled.img`
   height:85%;
   width:100%;
 `
-const Name = styled.div`
+const Name = styled.a`
 font-family: 'Open Sans', sans-serif;
 font-size: 1em;
     text-overflow: ellipsis;
@@ -105,6 +127,16 @@ font-size: 1em;
     color: #ffffff;
 `
 const Artist = styled.div`
+    font-family: 'Open Sans', sans-serif;
+    font-size: .75em;
+    text-overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    white-space:nowrap;
+    color: #b3b3b3;
+`
+
+const Artista = styled.a`
     font-family: 'Open Sans', sans-serif;
     font-size: .75em;
     text-overflow: hidden;

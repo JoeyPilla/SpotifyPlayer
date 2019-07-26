@@ -75,7 +75,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	v := url.Values{}
 	v.Set("grant_type", "authorization_code")
 	v.Set("code", code)
-	v.Set("redirect_uri", "http://76.187.109.190:5639/redirect")
+	v.Set("redirect_uri", "http://localhost:6789/redirect")
 	u := &url.URL{
 		Scheme:   "https",
 		Path:     "accounts.spotify.com/api/token",
@@ -114,7 +114,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 		if !found {
 			Users = append(Users, tempUser)
 		}
-		http.Redirect(w, r, fmt.Sprintf("http://76.187.109.190:5639/?email=%s", tempUser.Email), 301)
+		http.Redirect(w, r, fmt.Sprintf("http://localhost:3000/?email=%s", tempUser.Email), 301)
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, "Invalid authorization code, %q", code)
@@ -139,16 +139,19 @@ func getCurrentSongHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type SongInfo struct {
-	Track    string   `json:"track"`
-	Artists  []string `json:"artists"`
-	Album    string   `json:"album"`
-	AlbumArt []string `json:"albumArt`
+	Track        string   `json:"track"`
+	Artists      []string `json:"artists"`
+	Album        string   `json:"album"`
+	AlbumArt     []string `json:"albumArt"`
+	ArtistsUrl   []string `json:"artistsUrl"`
+	AudioPreview string   `json:"audioPreview"`
 }
 
 type ArtistInfo struct {
-	Artist   string   `json:"artist"`
-	Genres   []string `json:"genres"`
-	AlbumArt string   `json:"albumArt`
+	Artist    string   `json:"artist"`
+	Genres    []string `json:"genres"`
+	AlbumArt  string   `json:"albumArt"`
+	ArtistUrl string   `json:"artistUrl"`
 }
 
 func getTopArtistList(limit int, offset int, kind string, timeRange string, accessToken string) []ArtistInfo {
@@ -171,6 +174,7 @@ func getTopArtistList(limit int, offset int, kind string, timeRange string, acce
 		destructuredItem := item.(map[string]interface{})
 		name := destructuredItem["name"]
 		genresTemp := destructuredItem["genres"].([]interface{})
+		artistUrl := destructuredItem["external_urls"].(map[string]interface{})["spotify"].(string)
 		albumArtTemp := ""
 		if len(destructuredItem["images"].([]interface{})) > 0 {
 			albumArtTemp = destructuredItem["images"].([]interface{})[0].(map[string]interface{})["url"].(string)
@@ -181,9 +185,10 @@ func getTopArtistList(limit int, offset int, kind string, timeRange string, acce
 			genres = append(genres, s.(string))
 		}
 		data = append(data, ArtistInfo{
-			Artist:   name.(string),
-			Genres:   genres,
-			AlbumArt: albumArtTemp,
+			Artist:    name.(string),
+			Genres:    genres,
+			AlbumArt:  albumArtTemp,
+			ArtistUrl: artistUrl,
 		})
 
 	}
@@ -213,8 +218,15 @@ func getTopList(limit int, offset int, kind string, timeRange string, accessToke
 		album := destructuredItem["album"].(map[string]interface{})["name"]
 		albumArtTemp := destructuredItem["album"].(map[string]interface{})["images"].([]interface{})
 		artistsTemp := destructuredItem["artists"].([]interface{})
+		audioPreview := ""
+		if destructuredItem["preview_url"] != nil {
+			audioPreview = destructuredItem["preview_url"].(string)
+		}
 		artists := []string{}
+		artistsUrl := []string{}
 		for _, a := range artistsTemp {
+
+			artistsUrl = append(artistsUrl, a.(map[string]interface{})["external_urls"].(map[string]interface{})["spotify"].(string))
 			artists = append(artists, a.(map[string]interface{})["name"].(string))
 		}
 		albumArt := []string{}
@@ -222,10 +234,12 @@ func getTopList(limit int, offset int, kind string, timeRange string, accessToke
 			albumArt = append(albumArt, art.(map[string]interface{})["url"].(string))
 		}
 		data = append(data, SongInfo{
-			Track:    name.(string),
-			Artists:  artists,
-			Album:    album.(string),
-			AlbumArt: albumArt,
+			Track:        name.(string),
+			Artists:      artists,
+			Album:        album.(string),
+			AlbumArt:     albumArt,
+			ArtistsUrl:   artistsUrl,
+			AudioPreview: audioPreview,
 		})
 	}
 	return data
@@ -347,9 +361,9 @@ func main() {
 	http.HandleFunc("/redirect", redirectHandler)
 	http.HandleFunc("/currentSong", getCurrentSongHandler)
 	http.HandleFunc("/FavoriteArtists", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "http://76.187.109.190:5639/", 301)
+		http.Redirect(w, r, "http://localhost:6789/", 301)
 	})
 	http.HandleFunc("/topSongs", getTopSongsHandler)
 
-	log.Fatal(http.ListenAndServe(":4001", nil))
+	log.Fatal(http.ListenAndServe(":6789", nil))
 }
