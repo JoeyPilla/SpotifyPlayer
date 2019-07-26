@@ -1,10 +1,16 @@
-import React, {useState, useEffect} from "react";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import SpotifyLogin from './spotifyLogin';
+import React, {useState} from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components"
 import { FaBars } from 'react-icons/fa';
 import LoginCard from './LoginCard';
-export default function NavBar({ email, imageUrl, loggedIn, setEmail, setImageUrl, setLoggedIn }) {
+export default function NavBar({
+  email,
+  imageUrl,
+  loggedIn,
+  setEmail,
+  setImageUrl,
+  setLoggedIn,
+}) {
   const [clicked, setClicked] = useState(false)
   return (
     <NavContainer>
@@ -19,7 +25,7 @@ export default function NavBar({ email, imageUrl, loggedIn, setEmail, setImageUr
       <NavRight>
         {
           loggedIn ? (
-            <img  height= "50px" src={imageUrl}/>
+            <img height="50px" src={imageUrl} alt={"Spotify Logo"}/>
           ) : (
               <MenuContainer>
                 <StyledBar size="30px" onClick={() => setClicked(!clicked)}/>

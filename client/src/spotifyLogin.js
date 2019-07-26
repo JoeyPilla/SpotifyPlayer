@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { authEndpoint, clientId, redirectUri, scopes } from "./config";
 import hash from "./hash";
-import logo from "./logo.svg";
 import styled from "styled-components"
 import Spotify from './Spotify_Logo_RGB_Green.png';
 export default class SpotifyLogin extends Component {

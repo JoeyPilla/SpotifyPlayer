@@ -8,23 +8,32 @@ export default function FavoriteArtists({email}) {
     <>
       <NavContainer>
           <NavElement>
-          <StyledButton onClick={()=>setTerm("long_term")}>Long Term</StyledButton>
+            <StyledButton
+              onClick={() => setTerm("long_term")}>
+              Long Term
+            </StyledButton>
           </NavElement>
           <NavElement>
-          <StyledButton onClick={()=>setTerm("medium_term")}>Medium Term</StyledButton>
+            <StyledButton
+              onClick={() => setTerm("medium_term")}>
+              Medium Term
+            </StyledButton>
           </NavElement>
           <NavElement>
-          <StyledButton onClick={()=>setTerm("short_term")}>Short Term</StyledButton>
+            <StyledButton
+              onClick={() => setTerm("short_term")}>
+              Short Term
+            </StyledButton>
           </NavElement>
       </NavContainer>
-    <div>
-      <FetchFavoritesContainer
-          term={term}
-          type="artists"
-          email={email}
-      />
+      <div>
+        <FetchFavoritesContainer
+            term={term}
+            type="artists"
+            email={email}
+        />
       </div>
-      </>
+    </>
   );
 }
 
@@ -38,14 +47,13 @@ const NavContainer = styled.div`
 `
 
 const StyledButton = styled.button`
-  background-color: #222326; /* Green */
+  background-color: #222326;
   border: none;
   color: white;
-  text-align: center;
-  text-decoration: none;
   display: inline-block;
   font-family: Helvetica, Arial, sans-serif;
-
+  text-align: center;
+  text-decoration: none;
   :hover {
    background-color:#595959;
   }
@@ -54,11 +62,11 @@ const StyledButton = styled.button`
   }
 `;
 const NavElement = styled.div`
+  align-items: center;
   color: white;
   display: flex;
-  align-items: center;
-  justify-content: center;
   font-family: Helvetica, Arial, sans-serif;
+  justify-content: center;
   width: 150px;
   :hover {
    background-color:#595959;
