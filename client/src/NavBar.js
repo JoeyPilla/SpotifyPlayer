@@ -2,46 +2,39 @@ import React, {useState, useEffect} from "react";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import SpotifyLogin from './spotifyLogin';
 import styled from "styled-components"
-
-
-export default function NavBar() {
-  const [loggedIn, setLoggedIn] = useState(false)
-  useEffect(() => {
-    fetch(`/returningUser`).then(function (response) {
-      if (response.status === 500) {
-        return  response.text()
-      } else {
-        return response.text();
-      }
-    }).then(function (data) {
-      if (data === "Success") {
-        console.log(data);
-        setLoggedIn(true)
-      }
-    });
-  }, []);
+import { FaBars } from 'react-icons/fa';
+import LoginCard from './LoginCard';
+export default function NavBar({ email, imageUrl, loggedIn, setEmail, setImageUrl, setLoggedIn }) {
+  const [clicked, setClicked] = useState(false)
   return (
-      <NavContainer>
+    <NavContainer>
         <NavLeft>
           <NavElement>
-            <StyledLink to="/">Home</StyledLink>
+            <StyledLink to="/">Favorite Songs</StyledLink>
           </NavElement>
           <NavElement>
-            <StyledLink to="/FavoriteSongs/">Favorite Songs</StyledLink>
+            <StyledLink to="/FavoriteArtists">Favorite Artists</StyledLink>
           </NavElement>
-          {/* <NavElement>
-            <StyledLink to="/FavoriteArtists/">Favorite Artists</StyledLink>
-          </NavElement> */}
-        </NavLeft>
-        <NavRight>
-          {!loggedIn &&
-            <NavElement>
-              <SpotifyLogin />
-            </NavElement>
-          }
-        </NavRight>
-
-       
+      </NavLeft>
+      <NavRight>
+        {
+          loggedIn ? (
+            <img  height= "50px" src={imageUrl}/>
+          ) : (
+              <MenuContainer>
+                <StyledBar size="30px" onClick={() => setClicked(!clicked)}/>
+                {
+                  clicked ? (
+                      <LoginCard setEmail={setEmail} email={email} setImageUrl={setImageUrl} loggedIn={loggedIn} setLoggedIn={setLoggedIn} setClicked={setClicked}/>
+                  ) : (
+                      null
+                  )
+                }
+                </MenuContainer>
+            )
+        }
+        
+      </NavRight>
       </NavContainer>
   );
 }
@@ -57,6 +50,14 @@ const NavContainer = styled.div`
   background-color: #222326;
   Height: 50px;
 `
+
+const StyledBar = styled(FaBars)`
+  padding: 10px;
+  :hover {
+    color: #222326;
+    background-color: white;
+  }
+`
 const NavLeft = styled.div`
   display: flex;
   flex-direction: row;
@@ -64,9 +65,17 @@ const NavLeft = styled.div`
   Height: 50px;
 `
 const NavRight = styled.div`
-color: white;
+  color: white;
   Height: 50px;
+  justify-self: flex-end;
 `
+
+const MenuContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+`
+
 const StyledLink = styled(Link)`
   color: white;
   display: block;

@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import { authEndpoint, clientId, redirectUri, scopes } from "./config";
 import hash from "./hash";
 import logo from "./logo.svg";
-
+import styled from "styled-components"
+import Spotify from './Spotify_Logo_RGB_Green.png';
 export default class SpotifyLogin extends Component {
   constructor() {
     super();
@@ -34,21 +35,52 @@ export default class SpotifyLogin extends Component {
 
   render() {
     return (
-      <div className="App">
+      <>
           {!this.state.token && (
-            <>
+          <Spoti>
+            Login
             <a
               className="btn btn--loginApp-link"
               href={`${authEndpoint}?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${encodeURIComponent(scopes)}`}
             >
-            Authenticate Spotify
+              <SpotifyButton src={Spotify}/>
             </a>
-              </>
+              </Spoti>
           )}
           {this.state.token && (
             <h1>fdsa</h1>
           )}
-      </div>
+      </>
     );
   }
 }
+
+const SpotifyButton = styled.img`
+  border: none;
+  border-radius: 5px;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-family: Helvetica, Arial, sans-serif;
+  margin-right:15px;
+  margin-left:15px;
+  margin-Bottom:15px;
+  padding: 5px 5px 15px 5px;
+  height: 30px;
+  text-align: center;
+  text-justify: center;
+  :hover {
+   background-color:#595959;
+  }
+  .active {
+    background-color:#595959;
+  }
+`
+const Spoti = styled.div`
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  font-size: .9em;
+    font-family: Helvetica, Arial, sans-serif;
+`

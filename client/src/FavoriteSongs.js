@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import FetchFavoritesContainer from "./FetchFavoritesContainer";
 import styled from "styled-components"
 
-export default function FavoriteSongs() {
+export default function FavoriteSongs({email}) {
   const [term, setTerm] = useState("long_term")
   return (
     <>
@@ -14,13 +14,14 @@ export default function FavoriteSongs() {
           <StyledButton onClick={()=>setTerm("medium_term")}>Medium Term</StyledButton>
           </NavElement>
           <NavElement>
-          <StyledButton onClick={()=>setTerm("short_term")}>Long Term</StyledButton>
+          <StyledButton onClick={()=>setTerm("short_term")}>Short Term</StyledButton>
           </NavElement>
       </NavContainer>
     <div>
       <FetchFavoritesContainer
         term={term}
-        type="tracks"
+          type="tracks"
+          email={email}
       />
       </div>
       </>

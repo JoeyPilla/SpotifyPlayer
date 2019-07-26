@@ -1,38 +1,21 @@
 import React, {useState, useEffect} from "react";
 import styled from "styled-components"
 
-function getCurrentSong() {
-  fetch(`/currentSong`).then(function (response) {
-    if (response.status === 500) {
-      return  response.status
-    } else {
-      return response.json();
-    }
-  }).then(function (data) {
-    console.log(data);
-    if (typeof data !== 'number') {
-      
-    } else {
 
-    }
-  });
-}
-
-export default function Home({term, type, title}) {
+export default function FetchFavoritesContainer({ term, type, title, email }) {
   const [data, setData] = useState({songs: [], artists: []});
   useEffect(() => {
-    fetch(`/topSongs?term=${term}&type=${type}`)
+    fetch(`/topSongs?term=${term}&type=${type}&email=${email}`)
     .then(function (response) {
-      if (response.status === 500) {
-        return response.status
-      } else {
         return response.json();
-      }
     }).then(function (data) {
-      console.log(data);
-      setData(data)
+      if (data["Type"]) {
+        console.log(data);
+      } else {
+        setData(data)
+      }
     });
-  }, [term, type]);
+  }, [email, term, type]);
 
   //console.log(long, medium, short);
   var dataArray = []
@@ -58,16 +41,30 @@ export default function Home({term, type, title}) {
       )
     })
   } else if(data && type === "artists") {
-    dataArray = data.artists.map((artist) => {
+    dataArray = data.artists.map((artist, i) => {
+      var genres = artist.genres.reduce((acc, current, i) => {
+        if (i === 0) {
+          return current
+        }
+       return acc + ", " + current
+      }, "")
       return (
-        <li>
-          <p>
-          {`Artist: ${artist.artist}`}
-          </p>
-          <p>
-          {`Genre: ${artist.genres.toString()}`}
-          </p>
-        </li>
+        <Element>
+        <AlbumArt src={artist.AlbumArt} />
+        <Info>
+          <Count>
+            {i+1}
+          </Count>
+          <Info2>
+            <Name>
+              {`${artist.artist}`}
+            </Name>
+            <Artist>
+              {`${genres}`}
+            </Artist>
+          </Info2>
+        </Info>
+      </Element>
       )
     })
   }
