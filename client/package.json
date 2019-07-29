@@ -13,7 +13,7 @@
     "react-scripts": "3.0.1",
     "styled-components": "^4.3.2"
   },
-  "proxy": "http://localhost:6789",
+  "proxy": "http://localhost:4001",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

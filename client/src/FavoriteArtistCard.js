@@ -5,33 +5,53 @@ export default function FavoriteArtistCard({
   albumArt,
   count,
   genres,
-  artist,
-  artistUrl,
+  name,
+  nameUrl,
 }) {
   return (
+    <Container>
     <Element>
     <AlbumArt src={albumArt} />
     <Info>
       <Count>{count+1}</Count>
       <DataContainer>
         <Name
-          href={artistUrl}>
-          {`${artist}`}
+          href={nameUrl}>
+          {`${name}`}
         </Name>
         <Artist>{`${genres}`}</Artist>
       </DataContainer>
     </Info>
-  </Element>
+      </Element>
+      <BlurShadow src={albumArt}/>
+    </Container>
+
   )
 }
 
+const BlurShadow = styled.img`
+  -webkit-filter: blur(20px) opacity(50%);
+  filter: blur(20px) opacity(50%);
+  z-index: 0;
+  border-radius: 10px;
+  width: 325px;
+  height: 350px;
+  grid-column: 1;
+  grid-row: 1;
+`
 
-
-
-
+const Container = styled.div`
+  display: grid;  
+  margin-right: 30px;
+  margin-bottom: 40px;
+`
 
 const Element = styled.div`
+  position: relative;
+  top: 15px;
+  left: 15px;
   display: flex;
+  z-index: 10;
   flex-direction: column;
   //background-color: white;
   border-radius: 10px;
@@ -41,6 +61,8 @@ const Element = styled.div`
   margin-bottom: 20px;
   background-color: #282828;
   justify-items: space-between;
+  grid-column: 1;
+  grid-row: 1;
 `
 const AlbumArt = styled.img`
   src: ${props => "url(" + props.url + ")"};

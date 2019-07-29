@@ -5,7 +5,8 @@ import Redirect from './Redirect';
 import FavoriteArtists from './FavoriteArtists';
 import FavoriteSongs from './FavoriteSongs';
 import styled from "styled-components";
-
+import Modal from './Modal';
+import LoginCard from './LoginCard';
 
 function fetchReturningUser(setLoggedIn, setEmail, setImageUrl) {
   let params = new URLSearchParams(window.location.search);
@@ -32,14 +33,17 @@ function AppRouter() {
     fetchReturningUser(setLoggedIn, setEmail,setImageUrl)
   }, []);
   return (
+    <Container>
+    <Modal loggedIn={loggedIn}>
+        <LoginCard
+          setEmail={setEmail}
+          email={email}
+          setImageUrl={setImageUrl}
+          loggedIn={loggedIn}
+          setLoggedIn={setLoggedIn}/>
+    </Modal>
     <Router>
-      <NavBar
-        imageUrl={imageUrl}
-        setEmail={setEmail}
-        email={email}
-        setImageUrl={setImageUrl}
-        loggedIn={loggedIn}
-        setLoggedIn={setLoggedIn}/>
+      <NavBar/>
       <ContentContainer>
         <Route
           exact
@@ -67,7 +71,8 @@ function AppRouter() {
               setImageUrl={setImageUrl} />
           )}/>
       </ContentContainer>
-    </Router>
+      </Router>
+    </Container>
   );
 }
 const ContentContainer = styled.div`
@@ -75,6 +80,13 @@ const ContentContainer = styled.div`
   width:100%;
   margin-top: 50px;
   margin-left: 0;
+  grid-row: 1;
+  grid-column: 1;
+`
+const Container = styled.div`
+display: grid;
+height: 100vh;
+width: 100vw;
 `
 
 export default AppRouter;

@@ -50,6 +50,7 @@ export default function FetchFavoritesContainer({
     })
   } else if(data && type === "artists") {
     dataArray = data.artists.map((artist, i) => {
+      console.log(artist);
       var genres = artist.genres.reduce((acc, current, i) => {
         var value = "";
         i === 0 ? value = current : value = acc + ", " + current;
@@ -90,5 +91,7 @@ const Container = styled.div`
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-evenly;
-  padding-top: 10px;
+  padding-top: 2%;
+  padding-right: 2%;
+  margin-top: 25px;
 `

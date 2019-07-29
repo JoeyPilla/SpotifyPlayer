@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useRef, useState} from "react";
 import styled from "styled-components"
+import { FaRegPlayCircle, FaRegPauseCircle } from 'react-icons/fa';
 
 export default function FavoriteSongCard({
   albumArt,
@@ -8,15 +9,31 @@ export default function FavoriteSongCard({
   count,
   track
 }) {
-  var audio = new Audio(audioPreview);
+  const [playing, setPlaying] = useState(false)
+  const audioEl = useRef();
   return (
-    <Element>
+    <Container>
+      <audio ref={audioEl} src={audioPreview}/>
+      { playing ? (
+        <PauseCircle
+          size={"75px"}
+          onClick={() => {
+            setPlaying(false);
+            audioEl.current.pause();
+          }
+            
+          } />
+        ) : (<PlayCircle
+        size={"75px"}
+          onClick={() => {
+            setPlaying(true);
+            audioEl.current.play();
+        }} />
+      ) }
+      <Element>
       <AlbumArt
         src={albumArt}
-        audioPreview={audioPreview}
-        onClick={() => {
-          audio.paused ? audio.play() : audio.pause();
-        }}/>
+        audioPreview={audioPreview}/>
     <Info>
       <Count>{count+1}</Count>
       <DataContainer>
@@ -24,11 +41,17 @@ export default function FavoriteSongCard({
         <Artist>{artists}</Artist>
       </DataContainer>
     </Info>
-  </Element>
+      </Element>
+      <BlurShadow src={albumArt}/>
+    </Container>
   )
 }
 
 const Element = styled.div`
+  position: relative;
+  top: 15px;
+  left: 15px;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   //background-color: white;
@@ -36,10 +59,43 @@ const Element = styled.div`
   color:black;
   width: 300px;
   height: 325px;
-  margin-bottom: 20px;
   background-color: #282828;
   justify-items: space-between;
+  grid-column: 1;
+  grid-row: 1;
 `
+
+
+const PlayCircle = styled(FaRegPlayCircle)`
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: center;
+  align-self: center;
+ color: white;
+  z-index:15;
+  size: 10em;
+  `
+
+const PauseCircle = styled(FaRegPauseCircle)`
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: center;
+  align-self: center;
+ color: white;
+  z-index:15;
+  size: 10em;
+  `
+const BlurShadow = styled.img`
+  -webkit-filter: blur(20px) opacity(50%);
+  filter: blur(20px) opacity(50%);
+  z-index: 0;
+  border-radius: 10px;
+  width: 325px;
+  height: 350px;
+  grid-column: 1;
+  grid-row: 1;
+`
+
 const AlbumArt = styled.img`
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
@@ -63,6 +119,12 @@ const Artist = styled.div`
     overflow-y: hidden;
     white-space:nowrap;
     color: #b3b3b3;
+`
+const Container = styled.div`
+  display: grid;  
+  margin-right: 15px;
+  margin-left: 15px;
+  margin-bottom: 40px;
 `
 
 const Info = styled.div`

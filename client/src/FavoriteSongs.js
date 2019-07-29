@@ -1,12 +1,18 @@
 import React, {useState} from "react";
 import FetchFavoritesContainer from "./FetchFavoritesContainer";
 import styled from "styled-components"
+import { FaBars } from 'react-icons/fa';
 
 export default function FavoriteSongs({email}) {
   const [term, setTerm] = useState("long_term")
+  const [clicked, setClicked] = useState(false);
   return (
     <>
-      <NavContainer>
+      <StyledBar
+            size={"20px"}
+            onClick={() => setClicked(!clicked)} />
+      {clicked ? (
+        <NavContainer>
           <NavElement>
             <StyledButton
               onClick={() => setTerm("long_term")}>
@@ -25,7 +31,10 @@ export default function FavoriteSongs({email}) {
               Short Term
             </StyledButton>
           </NavElement>
-      </NavContainer>
+        </NavContainer>
+      ) : (
+        <></>
+        )}
       <div>
         <FetchFavoritesContainer
           term={term}
@@ -38,11 +47,15 @@ export default function FavoriteSongs({email}) {
 }
 
 const NavContainer = styled.div`
+  position: fixed;
+  top: 50;
+  left: 0;
+  z-index: 50;
   Height: 50px;
   background-color: #222326;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   width: 100%;
 `
 
@@ -68,7 +81,7 @@ const NavElement = styled.div`
   display: flex;
   font-family: Helvetica, Arial, sans-serif;
   justify-content: center;
-  width: 150px;
+  padding-right: 5px;
   :hover {
    background-color:#595959;
   }
@@ -76,3 +89,10 @@ const NavElement = styled.div`
     color: red;
   }
 `;
+const StyledBar = styled(FaBars)`
+  position: fixed;
+  top: 50;
+  left: 0;
+  z-index: 55;
+  padding: 10px;
+`

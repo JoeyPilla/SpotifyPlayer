@@ -1,51 +1,30 @@
 import React, {useState} from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components"
-import { FaBars } from 'react-icons/fa';
 import LoginCard from './LoginCard';
-export default function NavBar({
-  email,
-  imageUrl,
-  loggedIn,
-  setEmail,
-  setImageUrl,
-  setLoggedIn,
-}) {
-  const [clicked, setClicked] = useState(false)
+export default function NavBar({}) {
   return (
     <NavContainer>
-        <NavLeft>
-          <NavElement>
-            <StyledLink to="/">Favorite Songs</StyledLink>
-          </NavElement>
-          <NavElement>
-            <StyledLink to="/FavoriteArtists">Favorite Artists</StyledLink>
-          </NavElement>
+      <NavLeft>
+          <>
+            <NavElement>
+              <StyledLink to="/">
+                Favorite Songs
+              </StyledLink>
+            </NavElement>
+            <NavElement>
+              <StyledLink to="/FavoriteArtists">
+                Favorite Artists
+              </StyledLink>
+            </NavElement>
+          </>
       </NavLeft>
-      <NavRight>
-        {
-          loggedIn ? (
-            <img height="50px" src={imageUrl} alt={"Spotify Logo"}/>
-          ) : (
-              <MenuContainer>
-                <StyledBar size="30px" onClick={() => setClicked(!clicked)}/>
-                {
-                  clicked ? (
-                      <LoginCard setEmail={setEmail} email={email} setImageUrl={setImageUrl} loggedIn={loggedIn} setLoggedIn={setLoggedIn} setClicked={setClicked}/>
-                  ) : (
-                      null
-                  )
-                }
-                </MenuContainer>
-            )
-        }
-        
-      </NavRight>
-      </NavContainer>
+    </NavContainer>
   );
 }
 
 const NavContainer = styled.div`
+  z-index: 50;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -55,14 +34,6 @@ const NavContainer = styled.div`
   width: 100%;
   background-color: #222326;
   Height: 50px;
-`
-
-const StyledBar = styled(FaBars)`
-  padding: 10px;
-  :hover {
-    color: #222326;
-    background-color: white;
-  }
 `
 const NavLeft = styled.div`
   display: flex;
@@ -75,7 +46,6 @@ const NavRight = styled.div`
   Height: 50px;
   justify-self: flex-end;
 `
-
 const MenuContainer = styled.div`
   display: flex;
   flex-direction: column;
