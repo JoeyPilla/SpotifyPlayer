@@ -1,40 +1,60 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import FetchFavoritesContainer from "./FetchFavoritesContainer";
 import styled from "styled-components"
 import { FaBars } from 'react-icons/fa';
+import { useTransition, animated } from 'react-spring';
 
-export default function FavoriteSongs({email}) {
+export default function FavoriteSongs({ email }) {
+  const [prevScrollPos, setPrevScrollPos] = useState(window.scrollY);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(
+    () => {
+      const handleScroll = () => {
+        const currentScrollPos = window.pageYOffset;
+        setVisible(prevScrollPos > currentScrollPos || currentScrollPos < 100);
+        setPrevScrollPos(currentScrollPos);
+      };
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    },
+    [prevScrollPos, visible]
+  );
+
+  const transitions = useTransition(visible, null, {
+  from: { opacity: 0 },
+  enter: { opacity: 1 },
+  leave: { opacity: 0 },
+  })
+
+
+
   const [term, setTerm] = useState("long_term")
-  const [clicked, setClicked] = useState(false);
   return (
     <>
-      <StyledBar
-            size={"20px"}
-            onClick={() => setClicked(!clicked)} />
-      {clicked ? (
-        <NavContainer>
-          <NavElement>
+      {transitions.map(({ item, key, props }) =>
+        item &&
+        <NavContainer style={props}>
+          <NavElement selected={term === "long_term"}>
             <StyledButton
               onClick={() => setTerm("long_term")}>
               Long Term
             </StyledButton>
           </NavElement>
-          <NavElement>
+          <NavElement selected={term === "medium_term"}>
             <StyledButton
               onClick={() => setTerm("medium_term")}>
               Medium Term
             </StyledButton>
           </NavElement>
-          <NavElement>
+          <NavElement selected={term === "short_term"}>
             <StyledButton
               onClick={() => setTerm("short_term")}>
               Short Term
             </StyledButton>
           </NavElement>
         </NavContainer>
-      ) : (
-        <></>
-        )}
+  )}
       <div>
         <FetchFavoritesContainer
           term={term}
@@ -46,7 +66,7 @@ export default function FavoriteSongs({email}) {
   );
 }
 
-const NavContainer = styled.div`
+const NavContainer = styled(animated.div)`
   position: fixed;
   top: 50;
   left: 0;
@@ -60,7 +80,9 @@ const NavContainer = styled.div`
 `
 
 const StyledButton = styled.button`
-  background-color: #222326; /* Green */
+  color: white;
+  cursor: pointer;
+  background-color: rgba(0,0,0,0);
   border: none;
   color: white;
   display: inline-block;
@@ -69,13 +91,12 @@ const StyledButton = styled.button`
   text-decoration: none;
   :hover {
    background-color:#595959;
-  }
-  .active {
-    background-color:#595959;
+   cursor: pointer;
   }
 `;
 
 const NavElement = styled.div`
+  ${props => props.selected ? "background-color:#595959" : ""}
   align-items: center;
   color: white;
   display: flex;
@@ -85,10 +106,8 @@ const NavElement = styled.div`
   :hover {
    background-color:#595959;
   }
-  .active {
-    color: red;
-  }
 `;
+
 const StyledBar = styled(FaBars)`
   position: fixed;
   top: 50;

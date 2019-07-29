@@ -1,31 +1,57 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import FetchFavoritesContainer from "./FetchFavoritesContainer";
 import styled from "styled-components"
+import { useTransition, animated } from 'react-spring';
 
 export default function FavoriteArtists({email}) {
   const [term, setTerm] = useState("long_term")
+  const [prevScrollPos, setPrevScrollPos] = useState(window.scrollY);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(
+    () => {
+      const handleScroll = () => {
+        const currentScrollPos = window.pageYOffset;
+        setVisible(prevScrollPos > currentScrollPos || currentScrollPos < 100);
+        setPrevScrollPos(currentScrollPos);
+      };
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    },
+    [prevScrollPos, visible]
+  );
+
+  const transitions = useTransition(visible, null, {
+  from: { opacity: 0 },
+  enter: { opacity: 1 },
+  leave: { opacity: 0 },
+  })
+
   return (
     <>
-      <NavContainer>
-          <NavElement>
+      {transitions.map(({ item, key, props }) =>
+        item &&
+        <NavContainer style={props}>
+          <NavElement selected={term === "long_term"}>
             <StyledButton
               onClick={() => setTerm("long_term")}>
               Long Term
             </StyledButton>
           </NavElement>
-          <NavElement>
+          <NavElement selected={term === "medium_term"}>
             <StyledButton
               onClick={() => setTerm("medium_term")}>
               Medium Term
             </StyledButton>
           </NavElement>
-          <NavElement>
+          <NavElement selected={term === "short_term"}>
             <StyledButton
               onClick={() => setTerm("short_term")}>
               Short Term
             </StyledButton>
           </NavElement>
-      </NavContainer>
+        </NavContainer>
+      )}
       <div>
         <FetchFavoritesContainer
             term={term}
@@ -37,17 +63,22 @@ export default function FavoriteArtists({email}) {
   );
 }
 
-const NavContainer = styled.div`
+const NavContainer = styled(animated.div)`
+  position: fixed;
+  top: 50;
+  left: 0;
+  z-index: 50;
+  Height: 50px;
+  background-color: #222326;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   width: 100%;
-  background-color: #222326;
-  Height: 50px;
 `
 
 const StyledButton = styled.button`
-  background-color: #222326;
+  background-color: rgba(0,0,0,0);
+  cursor: pointer;
   border: none;
   color: white;
   display: inline-block;
@@ -56,18 +87,18 @@ const StyledButton = styled.button`
   text-decoration: none;
   :hover {
    background-color:#595959;
-  }
-  .active {
-    background-color:#595959;
+   cursor: pointer;
   }
 `;
+
 const NavElement = styled.div`
+  ${props => props.selected ? "background-color:#595959" : ""}
   align-items: center;
   color: white;
   display: flex;
   font-family: Helvetica, Arial, sans-serif;
   justify-content: center;
-  width: 150px;
+  padding-right: 5px;
   :hover {
    background-color:#595959;
   }

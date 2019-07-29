@@ -10,8 +10,6 @@ var code = ""
 var accessToken = ""
 var refreshToken = ""
 
-// var Users []spotify.User
-
 func main() {
 	buildHandler := http.FileServer(http.Dir("../../client/build"))
 	http.Handle("/", buildHandler)
@@ -20,7 +18,7 @@ func main() {
 	http.HandleFunc("/currentSong", getCurrentSongHandler)
 	http.HandleFunc("/topSongs", getTopSongsHandler)
 	http.HandleFunc("/FavoriteArtists", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "http://76.187.109.190:5639/", 301)
+		http.Redirect(w, r, options.link, 301)
 	})
 
 	log.Fatal(http.ListenAndServe(":4001", nil))

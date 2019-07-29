@@ -19,7 +19,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	v := url.Values{}
 	v.Set("grant_type", "authorization_code")
 	v.Set("code", code)
-	v.Set("redirect_uri", "http://76.187.109.190:5639/redirect")
+	v.Set("redirect_uri", options.redirectUri)
 	u := &url.URL{
 		Scheme:   "https",
 		Path:     "accounts.spotify.com/api/token",
@@ -59,7 +59,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 			spotify.Users = append(spotify.Users, tempUser)
 		}
 
-		http.Redirect(w, r, fmt.Sprintf("http://76.187.109.190:5639/?email=%s", tempUser.Email), 301)
+		http.Redirect(w, r, fmt.Sprintf(options.link+"/?email=%s", tempUser.Email), 301)
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, "Invalid authorization code, %q", code)

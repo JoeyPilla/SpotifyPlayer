@@ -70,7 +70,10 @@ export default function FetchFavoritesContainer({
   }
 
   return (
-        <Container>
+        <Container onScroll={() => {
+          console.log("scroll");
+        }
+        }>
           {dataArray}
         </Container>
   );
