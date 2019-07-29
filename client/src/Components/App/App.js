@@ -1,12 +1,14 @@
 import React, {useState, useEffect} from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
-import NavBar from './NavBar';
-import Redirect from './Redirect';
-import FavoriteArtists from './FavoriteArtists';
-import FavoriteSongs from './FavoriteSongs';
-import styled from "styled-components";
-import Modal from './Modal';
-import LoginCard from './LoginCard';
+import NavBar from '../Navigation/NavBar';
+import Redirect from '../Login/Redirect';
+import FavoriteArtists from '../Favorites/FavoriteArtist/FavoriteArtists';
+import FavoriteSongs from '../Favorites/FavoriteSong/FavoriteSongs';
+import Modal from '../Modal/Modal';
+import LoginCard from '../Login/LoginCard';
+import { Container, ContentContainer } from './styles';
+
+
 
 function fetchReturningUser(setLoggedIn, setEmail, setImageUrl) {
   let params = new URLSearchParams(window.location.search);
@@ -25,7 +27,7 @@ function fetchReturningUser(setLoggedIn, setEmail, setImageUrl) {
   }
 }
 
-function AppRouter() {
+export default function AppRouter() {
   const [email, setEmail] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [loggedIn, setLoggedIn] = useState(false)
@@ -75,18 +77,3 @@ function AppRouter() {
     </Container>
   );
 }
-const ContentContainer = styled.div`
-  left: 0;
-  width:100%;
-  margin-top: 50px;
-  margin-left: 0;
-  grid-row: 1;
-  grid-column: 1;
-`
-const Container = styled.div`
-display: grid;
-height: 100vh;
-width: 100vw;
-`
-
-export default AppRouter;

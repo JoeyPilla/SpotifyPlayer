@@ -1,9 +1,7 @@
 import React, {useState, useEffect} from "react";
-import { Link } from "react-router-dom";
-import styled from "styled-components"
-import LoginCard from './LoginCard';
-import { useTransition, animated } from 'react-spring';
-export default function NavBar({ }) {
+import { useTransition } from 'react-spring';
+import { NavContainer,NavLeft,StyledLink, NavElement } from './styles';
+export default function NavBar() {
   const [prevScrollPos, setPrevScrollPos] = useState(window.scrollY);
   const [visible, setVisible] = useState(true);
   const [selected, setSelected] = useState('songs');
@@ -31,7 +29,7 @@ export default function NavBar({ }) {
       {
         transitions.map(({ item, key, props }) =>
         item &&
-          <NavContainer style={props}>
+          <NavContainer style={{...props, top:0}}>
             <NavLeft>
               <>
                 <NavElement selected={selected === "songs"}>
@@ -60,60 +58,3 @@ export default function NavBar({ }) {
     </>
   )
 }
-
-const NavContainer = styled(animated.div)`
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 50;
-  Height: 50px;
-  background-color: #222326;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  width: 100%;
-`
-const NavLeft = styled.div`
-  display: flex;
-  flex-direction: row;
-  color: white;
-  Height: 50px;
-`
-const NavRight = styled.div`
-  color: white;
-  Height: 50px;
-  justify-self: flex-end;
-`
-const MenuContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-`
-
-const StyledLink = styled(Link)`
-  color: white;
-  display: block;
-  font-family: Helvetica, Arial, sans-serif;
-  text-decoration: none;
-  :hover {
-   background-color:#595959;
-  }
-  .active {
-    color: red;
-  }
-`;
-const NavElement = styled.div`
-  ${props => props.selected ? "background-color:#595959" : ""}
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: Helvetica, Arial, sans-serif;
-  width: 150px;
-  :hover {
-   background-color:#595959;
-  }
-  .active {
-    color: red;
-  }
-`;

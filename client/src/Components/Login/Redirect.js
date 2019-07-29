@@ -2,7 +2,6 @@ import React, {useState, useEffect} from "react";
 
 function fetchRedirect(setEmail, setImageUrl, setLoggedIn, setError) {
   fetch(`/redirect?${window.location.href.split('?')[1]}`).then(function (response) {
-    console.log(response);
     if (response.status === 500) {
       setError(true)
       return  response.json()

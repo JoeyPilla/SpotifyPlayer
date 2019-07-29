@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
-import styled from "styled-components";
-import FavoriteArtistCard from './FavoriteArtistCard';
-import FavoriteSongCard from './FavoriteSongCard';
+import FavoriteArtistCard from './FavoriteArtist/FavoriteArtistCard';
+import FavoriteSongCard from './FavoriteSong/FavoriteSongCard';
+import { Container, ArtistLink } from './styles';
 
 function getTopSongs(term, type, email, setData) {
   fetch(`/topSongs?term=${term}&type=${type}&email=${email}`)
@@ -31,12 +31,15 @@ export default function FetchFavoritesContainer({
   if (data && type === "tracks") {
     dataArray = data.songs.map((song, i) => {
       const artists = song.artists.map((artist, i) => {
-        return (<ArtistLink
-          key={song.artistsUrl[i]}
-          href={song.artistsUrl[i]}>
-          {artist}
-        </ArtistLink>)
-      })
+        return (
+          <ArtistLink
+            key={song.artistsUrl[i]}
+            href={song.artistsUrl[i]}>
+            {artist}
+          </ArtistLink>
+        );
+      });
+
       return (
         <FavoriteSongCard
           key={song.track+song.albumArt[0]}
@@ -50,12 +53,12 @@ export default function FetchFavoritesContainer({
     })
   } else if(data && type === "artists") {
     dataArray = data.artists.map((artist, i) => {
-      console.log(artist);
       var genres = artist.genres.reduce((acc, current, i) => {
         var value = "";
         i === 0 ? value = current : value = acc + ", " + current;
         return value;
-      }, "")
+      }, "");
+
       return (
         <FavoriteArtistCard
           key={artist.artist}
@@ -70,31 +73,8 @@ export default function FetchFavoritesContainer({
   }
 
   return (
-        <Container onScroll={() => {
-          console.log("scroll");
-        }
-        }>
-          {dataArray}
-        </Container>
+    <Container>
+      {dataArray}
+    </Container>
   );
 }
-
-
-const ArtistLink = styled.a`
-    font-family: 'Open Sans', sans-serif;
-    font-size: .75em;
-    text-overflow: hidden;
-    overflow-x: hidden;
-    overflow-y: hidden;
-    white-space:nowrap;
-    color: #b3b3b3;
-`
-const Container = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
-  padding-top: 2%;
-  padding-right: 2%;
-  margin-top: 25px;
-`

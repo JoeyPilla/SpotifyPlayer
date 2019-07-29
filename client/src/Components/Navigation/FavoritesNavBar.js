@@ -1,10 +1,8 @@
 import React, {useState, useEffect} from "react";
-import FetchFavoritesContainer from "./FetchFavoritesContainer";
-import styled from "styled-components"
-import { useTransition, animated } from 'react-spring';
+import { useTransition } from 'react-spring';
+import { NavContainer, StyledButton, NavElement } from './styles';
 
-export default function FavoriteArtists({email}) {
-  const [term, setTerm] = useState("long_term")
+export default function FavoritesNavBar({ term, setTerm }) {
   const [prevScrollPos, setPrevScrollPos] = useState(window.scrollY);
   const [visible, setVisible] = useState(true);
 
@@ -22,10 +20,10 @@ export default function FavoriteArtists({email}) {
   );
 
   const transitions = useTransition(visible, null, {
-  from: { opacity: 0 },
-  enter: { opacity: 1 },
-  leave: { opacity: 0 },
-  })
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 0 },
+  });
 
   return (
     <>
@@ -52,57 +50,6 @@ export default function FavoriteArtists({email}) {
           </NavElement>
         </NavContainer>
       )}
-      <div>
-        <FetchFavoritesContainer
-            term={term}
-            type="artists"
-            email={email}
-        />
-      </div>
     </>
   );
 }
-
-const NavContainer = styled(animated.div)`
-  position: fixed;
-  top: 50;
-  left: 0;
-  z-index: 50;
-  Height: 50px;
-  background-color: #222326;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  width: 100%;
-`
-
-const StyledButton = styled.button`
-  background-color: rgba(0,0,0,0);
-  cursor: pointer;
-  border: none;
-  color: white;
-  display: inline-block;
-  font-family: Helvetica, Arial, sans-serif;
-  text-align: center;
-  text-decoration: none;
-  :hover {
-   background-color:#595959;
-   cursor: pointer;
-  }
-`;
-
-const NavElement = styled.div`
-  ${props => props.selected ? "background-color:#595959" : ""}
-  align-items: center;
-  color: white;
-  display: flex;
-  font-family: Helvetica, Arial, sans-serif;
-  justify-content: center;
-  padding-right: 5px;
-  :hover {
-   background-color:#595959;
-  }
-  .active {
-    color: red;
-  }
-`;
