@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import FavoriteArtistCard from './FavoriteArtist/FavoriteArtistCard';
 import FavoriteSongCard from './FavoriteSong/FavoriteSongCard';
 import { Container, ArtistLink } from './styles';
+import {Trail} from 'react-spring/renderprops';
 
 function getTopSongs(term, type, email, setData) {
   fetch(`/topSongs?term=${term}&type=${type}&email=${email}`)
@@ -74,7 +75,19 @@ export default function FetchFavoritesContainer({
 
   return (
     <Container>
-      {dataArray}
+      <Trail
+        items={dataArray}
+        from={{opacity: 0, transform: 'translate3d(0,-40px,0)' }}
+        to={{opacity: 1, transform: 'translate3d(0,0px,0)' }}
+      >
+        {data => props => {
+          return (
+            <div style={props}>
+              {data}
+            </div>
+          )
+        }}
+      </Trail>
     </Container>
   );
 }
