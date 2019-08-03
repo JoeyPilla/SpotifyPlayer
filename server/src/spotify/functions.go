@@ -24,10 +24,7 @@ func GetUserData(accessToken string) User {
 
 }
 
-//GetTopList gets the users top 60 tracks/artists based on kind
-func GetTopList(offset int, kind, timeRange, accessToken string) interface{} {
-	url := fmt.Sprintf("https://api.spotify.com/v1/me/top/%s?limit=20&offset=%d&time_range=%s", kind, offset*20, timeRange)
-
+func getTopListHelper(c chan interface{}, url, kind, accessToken string)  {
 	res, err := makeRequest(url, accessToken)
 	if err != nil {
 		fmt.Println(err)
@@ -35,7 +32,26 @@ func GetTopList(offset int, kind, timeRange, accessToken string) interface{} {
 	defer res.Body.Close()
 
 	body, _ := ioutil.ReadAll(res.Body)
-	return getData(body, kind)
+	c  <- getData(body, kind)
+}
+
+
+//GetTopList gets the users top 60 tracks/artists based on kind
+func GetTopList(kind, timeRange, accessToken string) []interface{}{
+	chanArray := []chan interface{} {
+		make(chan interface{}, 1), 
+		make(chan interface{}, 1), 
+		make(chan interface{}, 1),
+	}
+	retValue := []interface{}{}
+	for i, c := range chanArray {
+		url := fmt.Sprintf("https://api.spotify.com/v1/me/top/%s?limit=20&offset=%d&time_range=%s", kind, i*20, timeRange)
+		go getTopListHelper(c, url, kind, accessToken)
+	}
+	for _, c := range chanArray {
+		retValue = append(retValue, <-c)
+	}
+	return retValue
 }
 
 func getData(body []byte, kind string) interface{} {

@@ -80,7 +80,6 @@ func getCurrentSongHandler(w http.ResponseWriter, r *http.Request) {
 	defer res.Body.Close()
 	body, _ := ioutil.ReadAll(res.Body)
 	w.Write(body)
-
 }
 
 func getTopSongsHandler(w http.ResponseWriter, r *http.Request) {
@@ -109,14 +108,17 @@ func getTopSongsHandler(w http.ResponseWriter, r *http.Request) {
 		Songs:   []spotify.SongInfo{},
 		Artists: []spotify.ArtistInfo{},
 	}
-	for i := 0; i < 3; i++ {
-		if kind == "tracks" {
-			body.Songs = append(body.Songs, spotify.GetTopList(i, kind, term, user.AccessToken).([]spotify.SongInfo)...)
-		} else {
-
-			body.Artists = append(body.Artists, spotify.GetTopList(i, kind, term, user.AccessToken).([]spotify.ArtistInfo)...)
+	if kind == "tracks" {
+		resp := spotify.GetTopList(kind, term, user.AccessToken)
+		for _, value := range resp {
+			body.Songs = append(body.Songs, value.([]spotify.SongInfo)...)
 		}
-	}
+	} else {
+		resp := spotify.GetTopList(kind, term, user.AccessToken)
+			for _, value := range resp {
+				body.Artists = append(body.Artists, value.([]spotify.ArtistInfo)...)
+			}
+		}
 	resJson, err := json.Marshal(body)
 	if err != nil {
 		fmt.Println(err)
@@ -183,5 +185,4 @@ func returningUserHandler(w http.ResponseWriter, r *http.Request) {
 		resJSON, _ = json.Marshal(Error{Type: "Error"})
 		w.Write(resJSON)
 	}
-
 }
