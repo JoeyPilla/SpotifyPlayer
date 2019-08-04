@@ -1,8 +1,9 @@
 package main
 
 import (
-	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 var client = &http.Client{}
@@ -11,15 +12,10 @@ var accessToken = ""
 var refreshToken = ""
 
 func main() {
-	buildHandler := http.FileServer(http.Dir("../../client/build"))
-	http.Handle("/", buildHandler)
-	http.HandleFunc("/returningUser", returningUserHandler)
-	http.HandleFunc("/redirect", redirectHandler)
-	http.HandleFunc("/currentSong", getCurrentSongHandler)
-	http.HandleFunc("/topSongs", getTopSongsHandler)
-	http.HandleFunc("/FavoriteArtists", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, options.link, 301)
-	})
+	svr := server{
+		router: mux.NewRouter(),
+	}
 
-	log.Fatal(http.ListenAndServe(":4001", nil))
+	svr.routes()
+	svr.start()
 }

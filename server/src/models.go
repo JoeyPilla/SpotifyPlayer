@@ -1,5 +1,20 @@
 package main
 
+import (
+	"github.com/gorilla/mux"
+)
+
+type server struct {
+	router *mux.Router
+}
+
+type intitalOptions struct {
+	clientId     string
+	clientSecret string
+	redirectUri  string
+	link         string
+}
+
 type Error struct {
 	Type string `url:"error"`
 }
