@@ -24,7 +24,7 @@ func GetUserData(accessToken string) User {
 
 }
 
-func getTopListHelper(c chan interface{}, url, kind, accessToken string)  {
+func getTopListHelper(c chan interface{}, url, kind, accessToken string) {
 	res, err := makeRequest(url, accessToken)
 	if err != nil {
 		fmt.Println(err)
@@ -32,15 +32,17 @@ func getTopListHelper(c chan interface{}, url, kind, accessToken string)  {
 	defer res.Body.Close()
 
 	body, _ := ioutil.ReadAll(res.Body)
-	c  <- getData(body, kind)
+	c <- getData(body, kind)
 }
 
-
 //GetTopList gets the users top 60 tracks/artists based on kind
-func GetTopList(kind, timeRange, accessToken string) []interface{}{
-	chanArray := []chan interface{} {
-		make(chan interface{}, 1), 
-		make(chan interface{}, 1), 
+func GetTopList(kind, timeRange, accessToken string) []interface{} {
+	if accessToken == "" {
+		return []interface{}{}
+	}
+	chanArray := []chan interface{}{
+		make(chan interface{}, 1),
+		make(chan interface{}, 1),
 		make(chan interface{}, 1),
 	}
 	retValue := []interface{}{}
@@ -63,6 +65,7 @@ func getData(body []byte, kind string) interface{} {
 	} else {
 		return getListOfArtists(items)
 	}
+	return nil
 }
 
 func makeRequest(url, accessToken string) (*http.Response, error) {

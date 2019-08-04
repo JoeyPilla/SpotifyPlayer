@@ -41,8 +41,8 @@ func (s *server) redirectHandler() http.HandlerFunc {
 		reqBuilder(req)
 
 		res, err := client.Do(req)
-		defer res.Body.Close()
 		errorHandler(err)
+		defer res.Body.Close()
 
 		body, _ := ioutil.ReadAll(res.Body)
 		var tokens TokenResponse
@@ -59,6 +59,7 @@ func (s *server) redirectHandler() http.HandlerFunc {
 			} else {
 				tempUser = user
 			}
+
 			http.Redirect(w, r, fmt.Sprintf(options.link+"/?email=%s", tempUser.Email), 301)
 		} else {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -93,13 +94,11 @@ func (s *server) getTopSongsHandler() http.HandlerFunc {
 		term := query["term"][0]
 		email := query["email"][0]
 		user, found := findUser(email)
-
 		if !found {
 			resJSON, _ := json.Marshal(Error{Type: "User not found"})
 			w.Write(resJSON)
 			return
 		}
-
 		body := spotify.TimeRanges{
 			Songs:   []spotify.SongInfo{},
 			Artists: []spotify.ArtistInfo{},

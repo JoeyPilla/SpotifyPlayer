@@ -10,7 +10,7 @@ var baseURL = "accounts.spotify.com"
 
 func findUser(email string) (spotify.User, bool) {
 	for _, u := range spotify.Users {
-		if u.Email == email {
+		if u.Email != "" && u.Email == email {
 			return u, true
 		}
 	}
