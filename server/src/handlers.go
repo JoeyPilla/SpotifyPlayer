@@ -25,7 +25,6 @@ func (s *server) redirectHandler() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		code := r.URL.Query()["code"][0]
-
 		v := url.Values{}
 		v.Set("grant_type", "authorization_code")
 		v.Set("code", code)
@@ -49,15 +48,16 @@ func (s *server) redirectHandler() http.HandlerFunc {
 		var tokens TokenResponse
 		err = json.Unmarshal(body, &tokens)
 		errorHandler(err)
-
 		if res.StatusCode == 200 {
 			accessToken = tokens.AccessToken
 			tempUser := spotify.GetUserData(accessToken)
 			tempUser.AccessToken = accessToken
 			tempUser.RefreshToken = tokens.RefreshToken
-			tempUser, found := findUser(tempUser.Email)
+			user, found := findUser(tempUser.Email)
 			if !found {
 				spotify.Users = append(spotify.Users, tempUser)
+			} else {
+				tempUser = user
 			}
 			http.Redirect(w, r, fmt.Sprintf(options.link+"/?email=%s", tempUser.Email), 301)
 		} else {
@@ -92,7 +92,6 @@ func (s *server) getTopSongsHandler() http.HandlerFunc {
 		kind := query["type"][0]
 		term := query["term"][0]
 		email := query["email"][0]
-
 		user, found := findUser(email)
 
 		if !found {
