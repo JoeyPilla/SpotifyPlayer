@@ -10,7 +10,7 @@ func (s *server) routes() {
 	s.router.Handle("/", s.buildHandler())
 	s.router.HandleFunc("/returningUser", s.returningUserHandler())
 	s.router.HandleFunc("/redirect", s.redirectHandler())
-	s.router.HandleFunc("/currentSong", s.getCurrentSongHandler())
+	//s.router.HandleFunc("/currentSong", s.getCurrentSongHandler())
 	s.router.HandleFunc("/topSongs", s.getTopSongsHandler())
 	s.router.HandleFunc("/FavoriteArtists", s.favoriteArtistsHandler())
 }

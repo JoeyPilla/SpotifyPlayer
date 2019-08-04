@@ -55,7 +55,7 @@ func (s *server) redirectHandler() http.HandlerFunc {
 			tempUser := spotify.GetUserData(accessToken)
 			tempUser.AccessToken = accessToken
 			tempUser.RefreshToken = tokens.RefreshToken
-			tempUser, found := findUser(tempUser.email)
+			tempUser, found := findUser(tempUser.Email)
 			if !found {
 				spotify.Users = append(spotify.Users, tempUser)
 			}
