@@ -15,7 +15,6 @@ func main() {
 	svr := server{
 		router: mux.NewRouter(),
 	}
-
 	svr.routes()
 	svr.start()
 }

@@ -21,7 +21,6 @@ func GetUserData(accessToken string) User {
 
 	body, _ := ioutil.ReadAll(res.Body)
 	return getUser(body)
-
 }
 
 func getTopListHelper(c chan interface{}, url, kind, accessToken string) {

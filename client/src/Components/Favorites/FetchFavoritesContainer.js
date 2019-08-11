@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import FavoriteArtistCard from './FavoriteArtist/FavoriteArtistCard';
 import FavoriteSongCard from './FavoriteSong/FavoriteSongCard';
 import { Container, ArtistLink } from './styles';
-import { useTrail, animated } from 'react-spring';
+import { useTrail, animated, config } from 'react-spring';
 
 function getTopSongs(term, type, email, setData) {
   fetch(`/topSongs?term=${term}&type=${type}&email=${email}`)
@@ -74,8 +74,8 @@ export default function FetchFavoritesContainer({
   }
 
   const trail = useTrail(dataArray.length, {
-    from: { opacity: 0, transform: 'translate3d(0,-40px,0)' },
-    to: { opacity: 1, transform: 'translate3d(0,0px,0)' }
+    from: { opacity: 0, transform: 'scale(0.4)' },
+    to: { opacity: 1, transform: 'scale(1)' }
   })
 
 
