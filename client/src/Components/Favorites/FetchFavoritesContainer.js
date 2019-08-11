@@ -9,6 +9,7 @@ function getTopSongs(term, type, email, setData) {
   .then(function (response) {
       return response.json();
   }).then(function (data) {
+    console.log(data);
     if (data["Type"]) {
       console.log(data);
     } else {
@@ -28,27 +29,26 @@ export default function FetchFavoritesContainer({
     getTopSongs(term, type, email, setData)
   }, [email, term, type]);
 
-  var dataArray = []
+  var dataArray = [];
   if (data && type === "tracks") {
     dataArray = data.songs.map((song, i) => {
       const artists = song.artists.map((artist, i) => {
         return (
           <ArtistLink
-            key={song.artistsUrl[i]}
-            href={song.artistsUrl[i]}>
-            {artist}
+            key={artist.href}
+            href={artist.external_urls.spotify}>
+            {artist.name}
           </ArtistLink>
         );
       });
-
       return (
         <FavoriteSongCard
-          key={song.track+song.albumArt[0]}
-          albumArt={song.albumArt[0]}
+          key={song.name+song.album.images[0]}
+          albumArt={song.album.images[0].URL}
           artists={artists}
-          audioPreview={song.audioPreview}
+          audioPreview={song.preview_url}
           count={i}
-          track={song.track}
+          track={song.name}
         />
       )
     })

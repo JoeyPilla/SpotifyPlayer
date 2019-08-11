@@ -48,7 +48,7 @@ export default function FavoriteSongCard({
         <Info>
           <Count>{count+1}</Count>
           <DataContainer>
-            <Name>{`${track}`}</Name>
+            {/* <Name>{`${track}`}</Name> */}
             <Artist>{artists}</Artist>
           </DataContainer>
         </Info>

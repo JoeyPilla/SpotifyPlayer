@@ -9,11 +9,29 @@ import (
 
 var client = &http.Client{}
 
+type Type struct {
+	Items []struct {
+		Type string
+	}
+}
+
+type TimeRanges struct {
+	Songs   []Track  `json:"songs"`
+	Artists []Artist `json:"artists"`
+}
+
+type User struct {
+	Email        string `json:"email"`
+	RefreshToken string `json:"refreshToken"`
+	AccessToken  string `json:"accessToken"`
+	ImageUrl     string `json:"imageUrl"`
+}
+
 //GetUserData Gets user data for logging in
 func GetUserData(accessToken string) User {
 	url := "https://api.spotify.com/v1/me"
 
-	res, err := makeRequest(url, accessToken)
+	res, err := client.Do(requestBuilder(url, accessToken))
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -24,14 +42,14 @@ func GetUserData(accessToken string) User {
 }
 
 func getTopListHelper(c chan interface{}, url, kind, accessToken string) {
-	res, err := makeRequest(url, accessToken)
+	res, err := client.Do(requestBuilder(url, accessToken))
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer res.Body.Close()
 
 	body, _ := ioutil.ReadAll(res.Body)
-	c <- getData(body, kind)
+	c <- getData(body)
 }
 
 //GetTopList gets the users top 60 tracks/artists based on kind
@@ -55,24 +73,29 @@ func GetTopList(kind, timeRange, accessToken string) []interface{} {
 	return retValue
 }
 
-func getData(body []byte, kind string) interface{} {
-	var results map[string]interface{}
-	json.Unmarshal(body, &results)
-	items := results["items"].([]interface{})
-	if kind == "tracks" {
-		return getListOfSongs(items)
-	} else {
-		return getListOfArtists(items)
+func getData(body []byte) interface{} {
+	var t Type
+	json.Unmarshal(body, &t)
+	if len(t.Items) == 0 {
+		return "invalid"
 	}
-	return nil
+	if t.Items[0].Type == "artist" {
+		var artists Artists
+		json.Unmarshal(body, &artists)
+		return artists
+	} else {
+		var tracks Tracks
+		json.Unmarshal(body, &tracks)
+		return tracks
+	}
 }
 
-func makeRequest(url, accessToken string) (*http.Response, error) {
+func requestBuilder(url, accessToken string) *http.Request {
 	req, _ := http.NewRequest("GET", url, nil)
 	bearer := "Bearer " + accessToken
 	req.Header.Set("Authorization", bearer)
 	req.Header.Set("Content-Type", "application/json")
-	return client.Do(req)
+	return req
 }
 
 func getUser(body []byte) User {

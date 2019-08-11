@@ -101,18 +101,18 @@ func (s *server) getTopSongsHandler() http.HandlerFunc {
 			return
 		}
 		body := spotify.TimeRanges{
-			Songs:   []spotify.SongInfo{},
-			Artists: []spotify.ArtistInfo{},
+			Songs:   []spotify.Track{},
+			Artists: []spotify.Artist{},
 		}
 		if kind == "tracks" {
 			resp := spotify.GetTopList(kind, term, user.AccessToken)
 			for _, value := range resp {
-				body.Songs = append(body.Songs, value.([]spotify.SongInfo)...)
+				body.Songs = append(body.Songs, value.(spotify.Tracks).Items...)
 			}
 		} else {
 			resp := spotify.GetTopList(kind, term, user.AccessToken)
 			for _, value := range resp {
-				body.Artists = append(body.Artists, value.([]spotify.ArtistInfo)...)
+				body.Artists = append(body.Artists, value.(spotify.Artists).Items...)
 			}
 		}
 		resJSON, err := json.Marshal(body)
