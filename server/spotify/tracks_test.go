@@ -6,23 +6,6 @@ import (
 	"testing"
 )
 
-// type intitalOptions struct {
-// 	clientId     string
-// 	clientSecret string
-// 	redirectUri  string
-// 	link         string
-// }
-
-// var options = intitalOptions{
-// 	"46f2786f859a4f7cbf7482de3acfe7cf",
-// 	"6317e7356b1341a5902de31f9b8591fd",
-// 	"http://localhost:4001/redirect",
-// 	"http://localhost:3000",
-// }
-
-// var refreshToken = "AQDCfEs04aRGDylszKEY8v3Ff9STXNU-NRuvDpdyFzbqcTSNoLjeJrcWww_QbVFp-lw7jmTyjTMF8mmkRelCTEx7a0CPQmBuH3RDrzB1upt3I5T-_Oph2-runwI2XhJP-7TdMQ"
-// var accessToken = returningUserHandler()
-
 func TestTrackGetDataTracks(t *testing.T) {
 	url := fmt.Sprintf("https://api.spotify.com/v1/me/top/%s?limit=20&offset=%d&time_range=%s", "tracks", 0, "long_term")
 	res, err := client.Do(requestBuilder(url, accessToken))

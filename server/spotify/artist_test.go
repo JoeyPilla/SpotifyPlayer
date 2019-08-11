@@ -9,21 +9,6 @@ import (
 	"testing"
 )
 
-type intitalOptions struct {
-	clientId     string
-	clientSecret string
-	redirectUri  string
-	link         string
-}
-
-var options = intitalOptions{
-	"46f2786f859a4f7cbf7482de3acfe7cf",
-	"6317e7356b1341a5902de31f9b8591fd",
-	"http://localhost:4001/redirect",
-	"http://localhost:3000",
-}
-
-var refreshToken = "AQDCfEs04aRGDylszKEY8v3Ff9STXNU-NRuvDpdyFzbqcTSNoLjeJrcWww_QbVFp-lw7jmTyjTMF8mmkRelCTEx7a0CPQmBuH3RDrzB1upt3I5T-_Oph2-runwI2XhJP-7TdMQ"
 var accessToken = returningUserHandler()
 
 func TestArtistGetDataArtists(t *testing.T) {
